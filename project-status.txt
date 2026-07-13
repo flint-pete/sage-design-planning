@@ -57,9 +57,12 @@ pywaggle2-design.md               | 46K  | pywaggle lib     | Camera acquisition
                                   |      |                  | lib enhancements RFC.
                                   |      |                  | §2.2.4 DECIDED, §7.1 =
                                   |      |                  | wrap-up steps.
-local-cache-design.md             | 15K  | WES + pywaggle   | Shared /local-cache:
-                                  |      | (infra+lib)      | 2-layer eviction +
-                                  |      |                  | wes-local-cache-mgr
+wes-local-cache-manager (repo)    | repo | WES (pywaggle2)  | Shared /local-cache:
+                                  |      |                  | 2-layer eviction +
+                                  |      |                  | manager DaemonSet
+                                  |      |                  | (was local-cache-
+                                  |      |                  | design.md; now its
+                                  |      |                  | own shipped repo)
                                   |      |                  | DaemonSet. Standalone
                                   |      |                  | RFC. Spans infra+lib.
 image-sampler2/docs/              | 71K  | image-sampler2   | Full LOCKED design.

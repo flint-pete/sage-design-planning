@@ -86,7 +86,7 @@ the producer's cache files, add world-readable files + traversable dirs
 This is the Layer-1 (plugin-side) responsibility in the two-layer cache design;
 it belongs in the pywaggle2 cache primitive / image-sampler2 cache.py.
 Moot until a shared /local-cache mount exists to test against.
-(Cross-ref: local-cache-design.md §3.2/§8; Infra #9, #4.2.)
+(Cross-ref: the `wes-local-cache-manager` repo DESIGN-AND-PURPOSE.md; Infra #9, #4.2.)
 
 ================================================================================
 bioclip (sage-bioclip)

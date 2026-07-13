@@ -457,7 +457,7 @@ manifest. For `/local-cache`, the clean interface is WES owning the path (see fi
 - **Preferred for `/local-cache`:** rather than each job hand-rolling a raw
   hostPath, add a `sage.yaml` opt-in (e.g. `local_cache: true`) that makes SES
   auto-mount the WES-owned `/local-cache` path — sidesteps the root-owner concern
-  and the nodeSelector friction. (See `local-cache-design.md` §4/§6.)
+  and the nodeSelector friction. (See the `wes-local-cache-manager` repo: DESIGN-AND-PURPOSE.md + HANDOFF.md.)
 - For issue #1 specifically, direct identity injection (env/API) still beats
   mounting the manifest.
 
