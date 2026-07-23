@@ -25,7 +25,8 @@ live resource** does NOT — it must be re-added by hand.
 | `wes-local-cache-manager` DaemonSet | ✅ auto | already a managed DaemonSet on this node |
 | `/media/plugin-data/local-cache` (the shared cache dir + data) | ✅ | on-disk, host path — survives |
 | **wes-nodeinfo-injection** (ConfigMap + patched scheduler) | ❌ **re-shim** | mutates live resources; patched scheduler is side-loaded |
-| **hummingcam-producer** (media-sampler3) | ❌ **re-run** | side-loaded image, `pluginctl run` pod |
+| **hummingcam-producer** (media-sampler3, image) | ❌ **re-run** | side-loaded image, `pluginctl run` pod |
+| **hummingcam-audio-producer** (media-sampler3, audio) | ❌ **re-run** | side-loaded image, `pluginctl run` pod |
 | **sage-yolo2-consumer** | ❌ **re-run** | (image persists in containerd if not GC'd, but the pod is gone) |
 | **sage-bioclip2-consumer** | ❌ **re-run** | same |
 
@@ -43,8 +44,9 @@ node — a low uptime + stale pods == reboot. (Do NOT assume the control plane
 ssh beckman@node-H00F.sage
 uptime                                    # low uptime => reboot happened
 sudo k3s kubectl get pods -A | grep -iE 'hummingcam|yolo2|bioclip2'   # expect Unknown/Failed
-sudo k3s kubectl delete pod hummingcam-producer sage-yolo2-consumer \
-    sage-bioclip2-consumer --ignore-not-found --grace-period=0 --force
+sudo k3s kubectl delete pod hummingcam-producer hummingcam-audio-producer \
+    sage-yolo2-consumer sage-bioclip2-consumer \
+    --ignore-not-found --grace-period=0 --force
 ```
 
 ### 1. Verify the pieces that should have survived
@@ -105,6 +107,31 @@ sudo pluginctl run --name hummingcam-producer --selector zone=core \
 Verify: pod 1/1 Running; fresh `<ts>-v2-H00F-top.jpg` frames appearing in
 `/media/plugin-data/local-cache/hummingcam/top/` every 10 s.
 
+### 4b. Start the audio producer (media-sampler3 — 15 s FLAC clip once/min)
+A SECOND media-sampler3 instance, independent of the image producer, capturing
+from the same camera's mic into its own cache subtree. Needs its own creds file
+(the audio path uses the `sage` camera account):
+```bash
+umask 077
+printf 'CAMERA_HOST=<CAMERA_IP>\nCAMERA_PORT=10000\nCAMERA_CHANNEL=0\nCAMERA_USER=<USER>\nCAMERA_PASSWORD=<PASS>\n' \
+  > ~/ms3-audio-creds.env
+chmod 600 ~/ms3-audio-creds.env
+
+sudo pluginctl run --name hummingcam-audio-producer --selector zone=core \
+  --env-from ~/ms3-audio-creds.env \
+  -v /media/plugin-data/local-cache:/local-cache \
+  localhost/media-sampler3:0.1.0 -- \
+  --continuous 60 --clip-seconds 15 \
+  --media audio --source-type camera_mic \
+  --camera-host <CAMERA_IP> --camera-port 10000 \
+  --audio-format flac --bandpass-fmax 8000 \
+  --stream hummingcam_mic --cache-name hummingcam-audio \
+  --cache-max-count 500 --cache-max-mb 2000 --heartbeat-secs 60 --vsn H00F
+```
+Verify: pod 1/1 Running; a 15 s FLAC + `.json` sidecar appears every 60 s in
+`/media/plugin-data/local-cache/hummingcam-audio/hummingcam_mic/`. (No consumer
+reads these yet — a future BirdNET consumer is the planned reader.)
+
 ### 5. Start the yolo2 consumer (detector + crop producer)
 ```bash
 sudo pluginctl run --name sage-yolo2-consumer --selector zone=core \
@@ -131,8 +158,8 @@ sudo pluginctl run --name sage-bioclip2-consumer --selector zone=core \
 
 ### 7. Verify the whole cascade
 ```bash
-sudo k3s kubectl get pods -A | grep -iE 'hummingcam-producer|yolo2-consumer|bioclip2-consumer'
-# all three -> Running, restarts=0
+sudo k3s kubectl get pods -A | grep -iE 'hummingcam-producer|hummingcam-audio-producer|yolo2-consumer|bioclip2-consumer'
+# all four -> Running, restarts=0
 
 # cloud proof: yolo2 publishes env.count.total to Beehive (frame-anchored)
 curl -s -X POST https://data.sagecontinuum.org/api/v1/query \
