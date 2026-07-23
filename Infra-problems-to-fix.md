@@ -325,6 +325,18 @@ has NO `upload_file` method (only get/publish/subscribe/init/stop), and no piexi
 You cannot "get a newer base image"; you MUST `pip install pywaggle[vision]==0.56.*`
 (and any other deps) on top, and keep code Python-3.8-compatible.
 
+### Reboot durability — the side-load workaround is NOT reboot-safe
+A node reboot clears k3s containerd's image store and kills all `pluginctl run`
+pods, so every side-loaded experimental component must be re-added by hand
+afterward (rebuild+import if the image is gone; re-run the pod; re-apply any
+manually-patched WES resources like the wes-nodeinfo-injection ConfigMap +
+scheduler). This is the direct operational cost of #2/#3/#4/#5 not being fixed:
+until the images live in a registry and the shims are folded into the CI stack,
+recovery is manual. For the live hummingcam producer/consumer cascade the exact
+recovery checklist is `REBOOT-RECOVERY-hummingcam-stack.md` (this repo). Distinct
+from #7 (control-plane link staleness) — that's about the node reconnecting; this
+is about restoring the experimental compute stack once it's back.
+
 ---
 
 ## 6. [BUG][P2] H00F `lan0` down → node-local registry (`10.31.81.1:5000`) unreachable
