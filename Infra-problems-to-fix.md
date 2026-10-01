@@ -333,7 +333,9 @@ manually-patched WES resources like the wes-nodeinfo-injection ConfigMap +
 scheduler). This is the direct operational cost of #2/#3/#4/#5 not being fixed:
 until the images live in a registry and the shims are folded into the CI stack,
 recovery is manual. For the live hummingcam producer/consumer cascade the exact
-recovery checklist is `REBOOT-RECOVERY-hummingcam-stack.md` (this repo). Distinct
+recovery checklist is media-sampler3's REBOOT-RECOVERY.md
+(https://github.com/flint-pete/media-sampler3/blob/master/REBOOT-RECOVERY.md); the old
+`REBOOT-RECOVERY-hummingcam-stack.md` here is superseded. Distinct
 from #7 (control-plane link staleness) — that's about the node reconnecting; this
 is about restoring the experimental compute stack once it's back.
 

@@ -1,3 +1,14 @@
+# Reboot Recovery — MOVED
+
+> **The current reboot runbook is
+> [media-sampler3/REBOOT-RECOVERY.md](https://github.com/flint-pete/media-sampler3/blob/master/REBOOT-RECOVERY.md).**
+> It covers the same stack under its current names (`camera-producer`,
+> `camera/top`, `camera-crops`, …), is node-independent (`$VSN`), and checks each
+> piece before re-applying it. Do not edit the copy below.
+
+<details>
+<summary>Superseded H00F "hummingcam" runbook (2026-07), kept for history</summary>
+
 # Reboot Recovery — hummingcam experimental stack (H00F)
 
 **Purpose:** while the hummingcam producer/consumer cascade and its WES support
@@ -195,3 +206,5 @@ curl -s -X POST https://data.sagecontinuum.org/api/v1/query \
 - `sage-bioclip2` — species classifier
 - `wes-nodeinfo-injection` — the identity shim (`github.com/flint-pete/wes-nodeinfo-injection`)
 - `wes-local-cache-manager` — the Layer-2 cache quota DaemonSet
+
+</details>
