@@ -102,20 +102,23 @@ Run log: `~/.hermes/cache/scratch/h039-run.md` on Flint (local, not in git).
 
 ## 4. Latent build and runtime risks (small fixes)
 
-- [ ] **Pin Python dependencies to what built on H039.** The birdnet2 break came
-      from an open-ended `birdnet>=0.2.16`, which picked up a breaking 1.x.
-      Still open-ended:
-  - sage-yolo2: `ultralytics>=8.3.70`, `pywaggle[all]>=0.56.0`,
-    `opencv-python-headless>=4.8.0`, `pillow>=10.0.0`
-  - sage-bioclip2: `pywaggle[all]`, `opencv`, `pillow`, `numpy` (pybioclip is
-    already pinned)
-  - sage-birdnet2: `librosa>=0.11`, `numpy`, `soundfile`, `pywaggle[audio]`
-
-  To get the working set: `pip freeze` inside each running pod on H039, then pin
-  those versions (or add them to each repo's existing constraints file).
-- [ ] **bioclip2 contacts huggingface.co at startup** (HEAD requests), even though
-      the weights are baked in. Test with outbound network blocked, or set
-      `HF_HUB_OFFLINE=1` in the image, so it works on nodes without internet.
+- [x] **Pinned Python dependencies (done 2026-10-02).** sage-yolo2, sage-bioclip2
+      and sage-birdnet2 pin every direct dependency to the H039-verified
+      versions. This includes bioclip2's open_clip, huggingface_hub and timm, and
+      birdnet2's tensorflow. Also fixed the unquoted
+      `opencv-python-headless>=4.8.0` in the yolo2/bioclip2 Dockerfiles: the
+      shell read it as a redirect, so pip installed the newest opencv. All three
+      images rebuilt and passed the seeded test on H039.
+- [x] **bioclip2 offline (done 2026-10-02).** `ENV HF_HUB_OFFLINE=1`, documented as
+      a "Sage adjustment" in its README.
+  - Before: 5 HEAD requests per start, resolving `main`, so the model could change
+    without notice.
+  - After: 0 requests.
+  - Works under `docker run --network none`. The old image did too (it falls back
+    to the cache when the network refuses the connection), so the old "needs
+    outbound network" claim was wrong. The real risks were the model changing
+    and stalls on a network that silently drops traffic.
+  - yolo2 was also confirmed to run with no network.
 
 ## 5. For the Sage CI team (track and hand off)
 
