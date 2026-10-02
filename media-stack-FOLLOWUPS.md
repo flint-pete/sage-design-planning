@@ -83,6 +83,9 @@ Run log: `~/.hermes/cache/scratch/h039-run.md` on Flint (local, not in git).
       birdnet2 integration, `make test` bootstrap, GPU caveat).
 - [ ] wes-nodeinfo-injection: **v1.1.0** (Tier 1b `install-pluginctl-nodeinfo.sh`,
       shared build helper, `/usr/local/bin` default).
+- [ ] sage-bioclip2: bump `sage.yaml` to **2.1.0** (behaviour changes since 2.0.0:
+      GPU via `--device auto`, offline model loading, pinned dependencies) and tag
+      `v2.1.0`. Update the image tag in the install guide and REBOOT-RECOVERY.
 - [ ] sage-birdnet2: bump `sage.yaml` to **2.0.1** (the dependencies changed:
       `birdnet==0.2.16` pin) and tag `v2.0.1`; it has never been tagged.
 - [ ] Decide whether sage-yolo2, sage-bioclip2 and pywaggle2-nodeinfo need tags.
@@ -135,9 +138,8 @@ Run log: `~/.hermes/cache/scratch/h039-run.md` on Flint (local, not in git).
     and only H00F had a hand-made `config.toml.tmpl` pointing runc at
     `nvidia-container-runtime`. Ask the CI team whether that template can now be
     removed from H00F, since it freezes H00F's containerd config across upgrades.
-  - **Remaining (our code):** sage-bioclip2 never passes `device` to pybioclip, so
-    it stays on the CPU. Pass `device="cuda" if torch.cuda.is_available() else
-    "cpu"`, then rebuild and re-test.
+  - **sage-bioclip2 fixed too (our code):** it now passes `device` to pybioclip
+    (`--device auto`) and logs `on cuda` on H039.
 - [ ] **Fold the node-identity change into WES:** patch 0001 (ConfigMap generator)
       and patch 0002 (pod builder). Ship 0002 in **both** the scheduler and the
       host `pluginctl` binary. Otherwise `pluginctl` pods stay unpatched, which is
@@ -153,8 +155,8 @@ Run log: `~/.hermes/cache/scratch/h039-run.md` on Flint (local, not in git).
 
 ## 6. Known limitations: good student starter tasks (already documented in the READMEs)
 
-- [ ] sage-bioclip2: pass a `device` to `TreeOfLifeClassifier`. It's always on the CPU today,
-      though the GPU is now available (about 15× faster on H039).
+- [x] sage-bioclip2: pass a `device` to `TreeOfLifeClassifier` (done 2026-10-02:
+      `--device auto`, on cuda on H039).
 - [ ] sage-bioclip2: read every `*-crop-N` directory, not just `top-crop-0`.
 - [ ] Hand-seeded test files (no `unique_id`) are reprocessed on every wake: mark
       them seen by path or content hash.
