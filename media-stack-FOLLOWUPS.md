@@ -1,4 +1,4 @@
-# Media stack: open follow-ups (state as of 2026-10-02)
+# Media stack: open follow-ups (state as of 2026-10-02, after the H039 reboot test)
 
 Working list for finishing the media-sampler3 stack on Thor nodes. This is a
 planning note for the maintainers, not student instructions. The student entry
@@ -40,11 +40,13 @@ Run log: `~/.hermes/cache/scratch/h039-run.md` on Flint (local, not in git).
 - **Installed:**
   - `/usr/local/bin/pluginctl-nodeinfo`
   - Tier 1 ConfigMap (5 vars)
-  - **Tier 2 patched scheduler** (`edge-scheduler:nodeinfo-test`)
   - cache manager
   - all four images
-- **Leftover:** `/local-cache/.state/sage-yolo2/probe-gps/` (a probe's seen-store;
-  safe to delete).
+- **Stock scheduler** `waggle/edge-scheduler:0.28.0` (Tier 2 was removed after the
+  reboot test). The root-podman image `localhost/edge-scheduler:nodeinfo-test` is
+  kept, because `install-pluginctl-nodeinfo.sh` reuses it.
+- **Seeds removed and probe seen-store deleted.** The seeded crops remain in
+  `camera-crops/top-crop-0` (the cache manager bounds them).
 
 ---
 
@@ -58,21 +60,22 @@ Run log: `~/.hermes/cache/scratch/h039-run.md` on Flint (local, not in git).
   - Check both producers' frames and sidecars carry H039's GPS.
   - This is the first live run of the audio producer outside H00F, and the first
     live microphone → birdnet2 run anywhere.
-- [ ] **Do a real reboot test using `REBOOT-RECOVERY.md`,** right after 6h works,
-  so the whole stack is covered. Follow it literally and fix anything that's
-  wrong or unclear. Check in particular:
-  - side-loaded images survive;
-  - `wes-identity` keeps its 5 vars;
-  - `/usr/local/bin/pluginctl-nodeinfo` is still there;
-  - the Tier 2 scheduler pod comes back (it has never been tested across a
-    reboot).
-  - H039 looks shared (about 60 user namespaces), so warn other users first.
-- [ ] **Remove Tier 2 from H039 after the reboot test**
-  (`wes-nodeinfo-injection/node-test/test-remove-scheduler.sh`). The guide no
-  longer uses it. Its envFrom injection is verified only on H00F, because it needs
-  a cloud SES job. If you want it verified on H039 first, submit one SES job to
-  H039 before removing it.
-- [ ] **Clean up H039:** delete `/local-cache/.state/sage-yolo2/probe-gps/`.
+- [x] **Reboot test, done 2026-10-02 (H039, no camera).**
+  - Followed `REBOOT-RECOVERY.md` literally. Everything survived: images, the
+    5-var ConfigMap, `pluginctl-nodeinfo`, the cache manager, `/local-cache` and
+    the seen-stores, and the Tier 2 scheduler.
+  - The `pluginctl` pods vanished, and the docs now say so. Step 0's grep was
+    narrowed.
+  - Step 8 relaunch, then the seeded test: all three consumers reached Beehive
+    with lat/lon.
+  - Added a step-9 no-camera check (bioclip2 needs new pixels: a mirrored seed).
+- [ ] **Re-run REBOOT-RECOVERY steps 5–7 after 6h:** camera credentials,
+  reachability, and both producers. These were skipped because no camera is
+  attached. A quick second reboot with the producers running would cover them.
+- [x] **Tier 2 removed from H039** (`test-remove-scheduler.sh`, stock 0.28.0
+  restored, pluginctl pods untouched). Its envFrom injection remains verified only
+  on H00F (it needs a cloud SES job).
+- [x] **Clean up H039:** probe seen-store deleted.
 
 ## 2. Release tags (after the reboot test, so the tags match what was verified)
 
@@ -178,6 +181,7 @@ Run log: `~/.hermes/cache/scratch/h039-run.md` on Flint (local, not in git).
 - sage-birdnet2 integrated as the third consumer: `birdnet==0.2.16` pin, seeded
   bluebird test, 2Gi memory limit. The deprecated `birdnet` repo is no longer
   referenced.
+- Reboot test on H039 and Tier 2 removal (2026-10-02, details in section 1).
 - Fixes found on H039: `make test` bootstrap, `--stream` documented as required,
   producer exit-2 table, Tier 2 verification (`-n ses`, needs SES), seed removal
   without wildcards.
