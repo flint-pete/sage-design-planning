@@ -77,19 +77,21 @@ Run log: `~/.hermes/cache/scratch/h039-run.md` on Flint (local, not in git).
   on H00F (it needs a cloud SES job).
 - [x] **Clean up H039:** probe seen-store deleted.
 
-## 2. Release tags (after the reboot test, so the tags match what was verified)
+## 2. Release tags: DONE 2026-10-02 (before the live camera test, by decision)
 
-- [ ] media-sampler3: **v0.1.1** (6 commits since v0.1.0: single-path guide,
-      birdnet2 integration, `make test` bootstrap, GPU caveat).
-- [ ] wes-nodeinfo-injection: **v1.1.0** (Tier 1b `install-pluginctl-nodeinfo.sh`,
-      shared build helper, `/usr/local/bin` default).
-- [ ] sage-bioclip2: bump `sage.yaml` to **2.1.0** (behaviour changes since 2.0.0:
-      GPU via `--device auto`, offline model loading, pinned dependencies) and tag
-      `v2.1.0`. Update the image tag in the install guide and REBOOT-RECOVERY.
-- [ ] sage-birdnet2: bump `sage.yaml` to **2.0.1** (the dependencies changed:
-      `birdnet==0.2.16` pin) and tag `v2.0.1`; it has never been tagged.
-- [ ] Decide whether sage-yolo2, sage-bioclip2 and pywaggle2-nodeinfo need tags.
-      Their changes since the last tag are docs only.
+Tagged now. Any fixes the live camera test needs ship as patch releases.
+
+- [x] media-sampler3 **v0.1.1** (image `localhost/media-sampler3:0.1.1`; producer
+      code unchanged from 0.1.0)
+- [x] wes-nodeinfo-injection **v1.1.0** (Tier 1b `install-pluginctl-nodeinfo.sh`)
+- [x] pywaggle2-nodeinfo **v0.1.2** (docs only; the vendored copies stay at v0.1.1)
+- [x] sage-yolo2 **v2.1.1** (pinned dependencies, opencv fix)
+- [x] sage-bioclip2 **v2.1.0** (GPU via `--device auto`, offline model loading,
+      pinned dependencies)
+- [x] sage-birdnet2 **v2.0.1** (first tag: `birdnet==0.2.16` pin plus all
+      dependencies pinned)
+- wes-local-cache-manager: unchanged since **v0.2.1**, so no new tag.
+- sage-design-planning: planning notes, not tagged.
 
 ## 3. Security
 
