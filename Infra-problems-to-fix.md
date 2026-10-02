@@ -202,7 +202,10 @@ dropped and will still fail on the broken builder.
 
 ---
 
-## 3. [BUG/ENHANCEMENT][P1] ECR portal cannot build arm64 NVIDIA images (QEMU crash)
+## 3. [BUG/ENHANCEMENT][P1] ✅ RESOLVED — ECR portal cannot build arm64 NVIDIA images (QEMU crash)
+
+> **RESOLVED (2026-10):** the cyberinfrastructure team fixed the ECR build for Thor
+> (arm64) images, including NVIDIA/CUDA bases. Kept below as a record.
 
 **Likely repo:** Sage ECR build pipeline (Jenkins)
 

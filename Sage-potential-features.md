@@ -58,6 +58,9 @@ reinvents this badly.
 
 ## 2. The ECR build system must natively support Thor / arm64 + NVIDIA base images
 
+> **DONE (2026-10):** the cyberinfrastructure team fixed the ECR build for Thor
+> images (including NVIDIA bases). The registry-push-scope item (b) is separate.
+
 **Problem.** Plugins targeting Thor (NVIDIA, arm64, sm_110) cannot be built
 through the normal ECR portal pipeline:
 
