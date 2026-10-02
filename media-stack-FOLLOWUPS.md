@@ -122,31 +122,22 @@ Run log: `~/.hermes/cache/scratch/h039-run.md` on Flint (local, not in git).
 
 ## 5. For the Sage CI team (track and hand off)
 
-- [ ] **GPU: no plugin gets the GPU on Thor nodes other than H00F.** File this in
-      `Infra-problems-to-fix.md`. Evidence and options:
-  - **Survey (Oct 2026):** H01A, H038, H039, H041 and H043 default to plain
-    `runc`. No `default_runtime_name`, no k3s `default-runtime`, no
-    `nvidia.com/gpu` resource, no device plugin. NVIDIA's runtime is installed and
-    registered on all of them.
-  - **Inside running pods on H039 and H041:** runtime handler is the default, no
-    `/dev/nv*`, `torch.cuda.is_available()` = False, and yolo2 logs
-    `Loading yolo11x.pt on cpu`. This happens even though the CUDA image sets
-    `NVIDIA_VISIBLE_DEVICES=all`.
-  - **H00F is the exception:** a hand-made
-    `/var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl` (2026-04-03) sets
-    `runtimes.runc.options BinaryName = "/usr/bin/nvidia-container-runtime"`. Note
-    that this freezes H00F's containerd config across k3s upgrades.
-  - **Code:** edge-scheduler (latest, 5391a00) and `pluginctl` never set
-    `runtimeClassName`. `limit.gpu` maps to `nvidia.com/gpu`, which no node
-    advertises.
-  - **Options:**
-    - (a) make NVIDIA's runtime the default (k3s `default-runtime: nvidia`, or
-      H00F's template);
-    - (b) have the scheduler and `pluginctl` set `runtimeClassName: nvidia` for
-      GPU plugins;
-    - (c) add a GPU device plugin so the scheduler can account for GPU use.
-  - **Separately:** sage-bioclip2 never asks pybioclip for a device, so it runs on
-    the CPU even on H00F (a code fix, below).
+- [x] **GPU: RESOLVED by the CI team (2026-10-02).** They set k3s
+  `default-runtime: nvidia` across the fleet.
+  - **Config:** `/etc/rancher/k3s/config.yaml` becomes containerd
+    `default_runtime_name = "nvidia"`, confirmed on H039, H041 and H00F. It's k3s's
+    own setting, so it survives k3s upgrades.
+  - **Verified on H039:** the sage-yolo2 pod has `/dev/nvidia*` and
+    `torch.cuda.is_available()` = True (NVIDIA Thor), and logs
+    `Loading yolo11x.pt on cuda`. A throwaway pod ran BioCLIP-2.5 on CUDA:
+    0.12 s/crop vs 1.86 s on the CPU, same result.
+  - **Background:** before the fix, H01A/H038/H039/H041/H043 defaulted to `runc`,
+    and only H00F had a hand-made `config.toml.tmpl` pointing runc at
+    `nvidia-container-runtime`. Ask the CI team whether that template can now be
+    removed from H00F, since it freezes H00F's containerd config across upgrades.
+  - **Remaining (our code):** sage-bioclip2 never passes `device` to pybioclip, so
+    it stays on the CPU. Pass `device="cuda" if torch.cuda.is_available() else
+    "cpu"`, then rebuild and re-test.
 - [ ] **Fold the node-identity change into WES:** patch 0001 (ConfigMap generator)
       and patch 0002 (pod builder). Ship 0002 in **both** the scheduler and the
       host `pluginctl` binary. Otherwise `pluginctl` pods stay unpatched, which is
@@ -162,7 +153,8 @@ Run log: `~/.hermes/cache/scratch/h039-run.md` on Flint (local, not in git).
 
 ## 6. Known limitations: good student starter tasks (already documented in the READMEs)
 
-- [ ] sage-bioclip2: pass a `device` to `TreeOfLifeClassifier` (always CPU today).
+- [ ] sage-bioclip2: pass a `device` to `TreeOfLifeClassifier`. It's always on the CPU today,
+      though the GPU is now available (about 15× faster on H039).
 - [ ] sage-bioclip2: read every `*-crop-N` directory, not just `top-crop-0`.
 - [ ] Hand-seeded test files (no `unique_id`) are reprocessed on every wake: mark
       them seen by path or content hash.
