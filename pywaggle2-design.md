@@ -515,6 +515,8 @@ remains to wrap up the overall design.
 
 ### 2.3 The WES side — IMPLEMENTED (`wes-nodeinfo-injection` v1.0.0)
 
+> **STATUS (2026-11): MERGED UPSTREAM** — waggle-edge-stack 697e338 + edge-scheduler 0.29.2 (envFrom on every pod, `pluginctl run` too) + pywaggle 0.57.1 `waggle.data.node_info_env`. Upstream uses `""` (not `999`) for missing coords and omits mobility. History below.
+>
 > **STATUS (2026-07-13): built and verified end-to-end on real hardware (H00F).**
 > The WES side described here is no longer a proposal — it ships as
 > `wes-nodeinfo-injection` v1.0.0 (two upstream patches: `update-stack.sh` adds
@@ -915,7 +917,7 @@ gpsd/live-stream path is NOT gated on owning a mobile node.
 
 ## 7. Status & next step
 
-DRAFT for discussion. **§2 (node identity) has shipped** — built, tested, and
+DRAFT for discussion. **§2 (node identity) has shipped, and was merged upstream in Nov 2026** (pywaggle 0.57.1, WES 697e338, SES 0.29.2) — built, tested, and
 verified end-to-end on H00F, packaged as `pywaggle2-nodeinfo` + `wes-nodeinfo-
 injection`; see those repos, not this doc, for its current state. What this document
 now tracks is the **still-unbuilt** work: §1 (the acquisition & metadata redesign)

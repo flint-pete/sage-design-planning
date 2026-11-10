@@ -25,7 +25,18 @@ Last updated: 2026-07-08.
 
 ---
 
-## 1. [ENHANCEMENT][P1] Plugins cannot learn their own VSN or GPS lat/lon at runtime
+## 1. [ENHANCEMENT][P1] ✅ RESOLVED — Plugins cannot learn their own VSN or GPS lat/lon at runtime
+
+> **RESOLVED (2026-11): merged upstream by the CI team.** waggle-edge-stack 4349cb7 /
+> d738bdf / fbd7371 (deployed via 697e338, SES_VERSION 0.29.2) put
+> `WAGGLE_NODE_GPS_LAT/LON` in `wes-identity`; edge-scheduler c9afb13 (0.29.2) adds
+> `envFrom: wes-identity` to every plugin pod, `pluginctl run` included; pywaggle
+> c1ffb21 (0.57.0, use 0.57.1) ships `waggle.data.node_info_env.read_node_info`.
+> Differences from our proposal: missing coords are `""` (not `999`); no
+> `WAGGLE_NODE_MOBILITY`; no `Plugin.get_node_info()` wrapper. Our patch 0001 was
+> incomplete (it missed the ConfigMap heredoc and kustomize literals); upstream's is
+> right. Follow-up for Sean (drafted 2026-11-10): guard `node_gps_lat/lon` with `|| echo ""` so a
+> malformed manifest can't abort `update_wes` under `set -e`. Kept below as a record.
 
 **Likely repos:** `waggle-sensor/pywaggle`, `waggle-sensor/waggle-edge-stack` (WES)
 
@@ -438,6 +449,8 @@ false "the plugin is dead" diagnoses.
 
 ## 9. [DOCS/ENHANCEMENT][P2] `pluginSpec` volume mounts: field EXISTS but is gated, insecure-by-TODO, and undocumented
 
+> Re-checked 2026-11-10 against edge-scheduler 0.29.2 (d119a00): unchanged (nodeSelector still required; `IsOwnedByRoot` still commented out). Still blocks a clean `/local-cache` opt-in.
+
 **Likely repo:** `waggle-edge-stack` / `edge-scheduler` (SES job schema) / docs
 
 **CORRECTED 2026-07-08** (was: "schema doesn't expose volume/hostPath mounts").
@@ -526,6 +539,8 @@ and allow safely lowering the detection threshold.
 
 ## 12. [BUG][P2] `pluginctl run` ignores the kubeconfig context namespace (hardcodes `default`)
 
+> Re-checked 2026-11-10 against pluginctl 0.29.2: unchanged (`resourceManager.Namespace = "default"`).
+
 **Likely repo:** `waggle-edge-stack` / `edge-scheduler` (`pkg/pluginctl`)
 
 **Found during:** image-sampler2 Stage-4 on-node verification on H00F (2026-07-06).
@@ -568,6 +583,8 @@ nor the context namespace is honored today.
 ---
 
 ## 13. [BUG/DOCS][P3] `pluginctl run --node <hostname>` fails scheduling with volume mounts; `--selector <label>` works
+
+> Re-checked 2026-11-10 against pluginctl 0.29.2: volume path unchanged; keep using `--selector zone=core`.
 
 **Likely repo:** `edge-scheduler` (`pkg/pluginctl`) + docs
 

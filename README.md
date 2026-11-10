@@ -2,7 +2,7 @@
 
 Design docs, RFC drafts, and planning notes for the Sage/Waggle edge-computing work
 — the "why" and "what next" behind the code that lives in the sibling repos
-(`pywaggle2-nodeinfo`, `wes-nodeinfo-injection`, `wes-local-cache-manager`,
+(`pywaggle2-nodeinfo` and `wes-nodeinfo-injection` (both merged upstream Nov 2026, archived), `wes-local-cache-manager`,
 `image-sampler2`, `sage-yolo`, `sage-bioclip`, `birdnet`).
 
 These are living planning documents, not deliverables. Implemented designs get
@@ -13,7 +13,7 @@ roadmap for unbuilt work and the running issue/feature lists.
 
 | Doc | What it is |
 |---|---|
-| `pywaggle2-design.md` | The pywaggle2 library redesign (RFC draft). §2 node-identity has SHIPPED (see `pywaggle2-nodeinfo`); §1 acquisition ladder + §3 library enhancements are the still-unbuilt roadmap. |
+| `pywaggle2-design.md` | The pywaggle2 library redesign (RFC draft). §2 node-identity has SHIPPED and is MERGED UPSTREAM (pywaggle 0.57.1, WES 697e338, SES 0.29.2); §1 acquisition ladder + §3 library enhancements are the still-unbuilt roadmap. |
 | `Infra-problems-to-fix.md` | Authoritative running list of Sage **platform** bugs/gaps to raise upstream as GitHub issues. |
 | `plugin-improvements.md` | Running list of enhancements to code **inside our plugins** (IS-1..IS-7 backlog). |
 | `Sage-potential-features.md` | Earlier feature/interface-improvement brainstorm (largely sorted into the two lists above). |

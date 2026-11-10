@@ -1,5 +1,26 @@
 # Media stack: open follow-ups (state as of 2026-10-02, after the H039 reboot test)
 
+## Update 2026-11-10: identity merged upstream; next test node is H019
+
+- **Node identity is upstream** (WES 697e338, SES/pluginctl 0.29.2, pywaggle 0.57.1).
+  Plugins moved to `pywaggle==0.57.1` and stock `pluginctl run`: media-sampler3
+  0.2.0, image-sampler2 0.6.0, sage-yolo2 2.2.0, sage-bioclip2 2.2.0, sage-birdnet2
+  2.1.0. wes-nodeinfo-injection and pywaggle2-nodeinfo are archived. The Tier
+  1/1b/2 items below are history.
+- **wes-local-cache-manager is the one platform piece not yet merged.** Keep it
+  side-loaded (a WES update does not prune it).
+- **H00F's cameras were retasked; H019 is the new test node.** Plan there:
+  - [ ] Read-only check: WES >= 697e338 (`wes-identity` has GPS keys), `pluginctl
+    version` >= 0.29.2, no leftover `pluginctl-nodeinfo`.
+  - [ ] Full install guide run (Steps 0–6h), live camera + mic, all on the
+    upstream identity path; confirm `location_source: node` and EXIF GPS.
+  - [ ] Reboot test with the revised REBOOT-RECOVERY.md.
+- **Retire on older test nodes when updated** (H039, H041, H00F): delete
+  `/usr/local/bin/pluginctl-nodeinfo`; let `update-stack.sh` regenerate
+  `wes-identity`; remove the `localhost/edge-scheduler:nodeinfo-test` image.
+- Then push the five plugin repos (committed locally, unpushed until H019 passes).
+
+
 Working list for finishing the media-sampler3 stack on Thor nodes. This is a
 planning note for the maintainers, not student instructions. The student entry
 point is
