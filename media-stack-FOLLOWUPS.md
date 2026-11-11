@@ -1,5 +1,45 @@
 # Media stack: open follow-ups (state as of 2026-10-02, after the H039 reboot test)
 
+## Status 2026-11-10 (evening): H03B is the test node; Hanwha capture works
+
+**Where we are.** All plugin repos are pushed. media-sampler3 0.3.0 adds Hanwha support
+(`--camera-vendor hanwha`) and is verified live on H03B.
+
+- **Why H03B.** H019 is clean and upstream-ready but has no camera. H01B's Hanwha
+  XNP-6400RW is in its manifest but answers nowhere on `lan0` (probably unpowered or
+  disconnected; needs someone on site). H03B has a live XNP-6400RW at
+  `10.31.81.32` (DHCP), plus a Raspberry Pi at `.66`.
+- **H03B node state:** WES 697e338, pluginctl and scheduler 0.29.2, `wes-identity`
+  GPS 42.5369, -72.1727, no shims, `default-runtime: nvidia`, 3.3 TB free.
+- **Fixed on H03B:** the camera provisioner was stuck since Sep 30 (Infra #23,
+  stale-Job form); the stuck job was deleted and runs complete again. It still
+  never finds the camera, because it only scans `.10`-`.20` (Infra #25; addendum
+  note for Sean in `~/AI-projects/_ref/`).
+- **Credentials:** Pete created `~/ms3-cam-creds.env` (mode 600) on H03B. It
+  currently holds an admin account; a dedicated non-admin viewer account is recommended.
+
+Install progress on H03B (INSTALLING-MEDIA-SAMPLER3.md):
+- [x] Step 0: the 5 repos cloned to `~/AI-projects`, at the same commits as GitHub.
+- [ ] Step 1: wes-local-cache-manager DaemonSet + `/media/plugin-data/local-cache`.
+- [ ] Steps 2–3: identity checks (the read-only check already showed them OK).
+- [x] Step 4: `localhost/media-sampler3:0.3.0` in k3s (546.7 MiB).
+- [ ] Step 5: sage-yolo2 2.2.0 (10.9 GiB) and sage-bioclip2 2.2.0 (17.7 GiB) are in
+  k3s; sage-birdnet2 2.1.0 is building (`~/build-consumers.sh`, log
+  `~/build-consumers.log`).
+- [x] Live Hanwha check: a one-shot capture (317,867 B, 1.7 s grab) uploaded, and
+  the node's upload agent reported it done. A 2-frame continuous run into the ring
+  (scratch dir `/tmp/hanwha-check`) gave native 1920×1080 JPEGs with EXIF GPS =
+  `wes-identity`. The night IR image looks fine.
+- [ ] Confirm the upload record in Beehive (`location_source`, GPS meta). Blocked:
+  the Sage data API returns 500 (`beehive-influxdb ... connection refused`).
+- [ ] Steps 6a–6g: producer smoke test, then the seeded bird image and song through
+  yolo2, bioclip2 and birdnet2.
+- [ ] Step 6h: a live Hanwha producer (`--name ptz`) feeding yolo2
+  (`--input /local-cache/camera/ptz`) and bioclip2.
+- [ ] Reboot test with REBOOT-RECOVERY.md.
+- **Audio, live end to end:** not possible on H03B or H019 (no mic). Needs a node
+  with a Reolink mic or a USB mic.
+
 ## Update 2026-11-10: identity merged upstream; next test node is H019
 
 - **Node identity is upstream** (WES 697e338, SES/pluginctl 0.29.2, pywaggle 0.57.1).
@@ -18,7 +58,7 @@
 - **Retire on older test nodes when updated** (H039, H041, H00F): delete
   `/usr/local/bin/pluginctl-nodeinfo`; let `update-stack.sh` regenerate
   `wes-identity`; remove the `localhost/edge-scheduler:nodeinfo-test` image.
-- Then push the five plugin repos (committed locally, unpushed until H019 passes).
+- ~~Then push the five plugin repos~~ Done 2026-11-10 (Pete asked to push before node testing).
 
 
 Working list for finishing the media-sampler3 stack on Thor nodes. This is a
