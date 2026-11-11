@@ -8,7 +8,7 @@
 - **Why H03B.** H019 is clean and upstream-ready but has no camera. H01B's Hanwha
   XNP-6400RW is in its manifest but answers nowhere on `lan0` (probably unpowered or
   disconnected; needs someone on site). H03B has a live XNP-6400RW at
-  `10.31.81.32` (DHCP), plus a Raspberry Pi at `.66`.
+  `10.31.81.32` (DHCP), plus its RAK LoRaWAN gateway at `.66` (hostname `rakpios`).
 - **H03B node state:** WES 697e338, pluginctl and scheduler 0.29.2, `wes-identity`
   GPS 42.5369, -72.1727, no shims, `default-runtime: nvidia`, 3.3 TB free.
 - **Fixed on H03B:** the camera provisioner was stuck since Sep 30 (Infra #23,

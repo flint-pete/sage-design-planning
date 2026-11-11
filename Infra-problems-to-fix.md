@@ -868,7 +868,15 @@ wes-camera-provisioner 7231452 `networkswitch.py` accepts only IPs matching
 XNP-6400RW got `.32` from DHCP, so WES has never configured or registered it: no
 `waggle` camera user, no datashim (pywaggle `Camera("ptz")` can't work), and no URI in
 the manifest. **H036 is the same:** its XNP-6400RW is at `.25`, also never found
-(checked 2026-11-10). Workaround: media-sampler3 0.3.0 (`--camera-vendor hanwha`) uses the
+(checked 2026-11-10).
+**Root cause of the mismatch:** the node's own DHCP server on `lan0` (NetworkManager
+shared-mode dnsmasq) hands out `dhcp-range=10.31.81.10,10.31.81.254,60m`, while the
+provisioner scans only `.10`-`.20`, so any camera beyond the 11th address is
+invisible. Easiest place to find cameras: `/var/lib/NetworkManager/dnsmasq-lan0.leases`
+(H03B: `10.31.81.32 e4:30:22:... XNP-6400RW-E43022C130C1`).
+**H01B:** the lease file has been empty since 2026-08-13 and nothing in the logs
+(back to Oct 11) shows the camera, so it hasn't requested an address in about three months
+(leases are 60 min). It's offline or disconnected, not misaddressed. Workaround: media-sampler3 0.3.0 (`--camera-vendor hanwha`) uses the
 camera's IP directly. Fix options: widen the scan and match on Hanwha MAC vendor /
 `XN*-` hostname, or reserve `.10`-`.20` for cameras in DHCP. Note:
 `~/AI-projects/_ref/note-for-sean-addendum-camera-ip-range.txt` (2026-11-10).
