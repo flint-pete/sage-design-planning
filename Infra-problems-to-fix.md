@@ -845,6 +845,21 @@ Small, high-friction-reduction doc fixes surfaced repeatedly:
 
 ---
 
+## 23. [BUG][P2] `wes-camera-provisioner` stuck forever after the node-manifest ConfigMap changes
+
+The CronJob mounts the hash-suffixed `waggle-node-manifest-v2-<hash>` by name; a WES update
+changes the hash and deletes the old ConfigMap. A run holding the old name waits in
+ContainerCreating forever, and `concurrencyPolicy: Forbid` then blocks all later runs.
+H019: stuck Job from the Nov 4 update, deleted 2026-11-10 (next run OK). H00F: the CronJob
+spec itself names a missing ConfigMap, stuck since 2026-09-30 (left as is). Sent to Sean
+with fix options (stable-named ConfigMap, `activeDeadlineSeconds`, update-stack cleanup).
+Note: `~/AI-projects/_ref/note-for-sean-wes-camera-provisioner-ssh-keys.txt`.
+
+## 24. [BUG][P3] `wes-update-waggle-ssh-keys` fails every 5 min on Thor nodes (no `waggle` user)
+
+hostPath `/home/waggle/.ssh` (type Directory) doesn't exist on Thors; the job has never
+succeeded on H019/H039/H041/H00F. Options in the same note to Sean.
+
 ## Cross-cutting: the durable fix
 
 Issues #2, #3, #4, #5, #6 all stem from the same root: **there is no working
