@@ -850,7 +850,8 @@ Small, high-friction-reduction doc fixes surfaced repeatedly:
 The CronJob mounts the hash-suffixed `waggle-node-manifest-v2-<hash>` by name; a WES update
 changes the hash and deletes the old ConfigMap. A run holding the old name waits in
 ContainerCreating forever, and `concurrencyPolicy: Forbid` then blocks all later runs.
-H019: stuck Job from the Nov 4 update, deleted 2026-11-10 (next run OK). H00F: the CronJob
+H019: stuck Job from the Nov 4 update, deleted 2026-11-10 (next run OK). H03B: same
+stale-Job form, stuck since 2026-09-30; deleted 2026-11-10 (next run OK). H00F: the CronJob
 spec itself names a missing ConfigMap, stuck since 2026-09-30 (left as is). Sent to Sean
 with fix options (stable-named ConfigMap, `activeDeadlineSeconds`, update-stack cleanup).
 Note: `~/AI-projects/_ref/note-for-sean-wes-camera-provisioner-ssh-keys.txt`.
@@ -859,6 +860,17 @@ Note: `~/AI-projects/_ref/note-for-sean-wes-camera-provisioner-ssh-keys.txt`.
 
 hostPath `/home/waggle/.ssh` (type Directory) doesn't exist on Thors; the job has never
 succeeded on H019/H039/H041/H00F. Options in the same note to Sean.
+
+## 25. [BUG][P2] `wes-camera-provisioner` only finds cameras at `10.31.81.10`-`.20`
+
+wes-camera-provisioner 7231452 `networkswitch.py` accepts only IPs matching
+`10.31.81.(1[0-9]|20)$` and scans `nmap -sP 10.31.81.10-20`. H03B's live Hanwha
+XNP-6400RW got `.32` from DHCP, so WES has never configured or registered it: no
+`waggle` camera user, no datashim (pywaggle `Camera("ptz")` can't work), and no URI in
+the manifest. Workaround: media-sampler3 0.3.0 (`--camera-vendor hanwha`) uses the
+camera's IP directly. Fix options: widen the scan and match on Hanwha MAC vendor /
+`XN*-` hostname, or reserve `.10`-`.20` for cameras in DHCP. Note:
+`~/AI-projects/_ref/note-for-sean-addendum-camera-ip-range.txt` (2026-11-10).
 
 ## Cross-cutting: the durable fix
 
