@@ -23,9 +23,10 @@ Install progress on H03B (INSTALLING-MEDIA-SAMPLER3.md):
 - [ ] Step 1: wes-local-cache-manager DaemonSet + `/media/plugin-data/local-cache`.
 - [ ] Steps 2–3: identity checks (the read-only check already showed them OK).
 - [x] Step 4: `localhost/media-sampler3:0.3.0` in k3s (546.7 MiB).
-- [ ] Step 5: sage-yolo2 2.2.0 (10.9 GiB) and sage-bioclip2 2.2.0 (17.7 GiB) are in
-  k3s; sage-birdnet2 2.1.0 is building (`~/build-consumers.sh`, log
-  `~/build-consumers.log`).
+- [x] Step 5: all built and in k3s, in 27 min total with no cached base image
+  (`~/build-consumers.sh`, log `~/build-consumers.log`): sage-yolo2 2.2.0
+  (10.9 GiB, 9 min), sage-bioclip2 2.2.0 (17.7 GiB, 12 min), sage-birdnet2 2.1.0
+  (2.8 GiB, 6 min). Disk: 154G used of 3.6T.
 - [x] Live Hanwha check: a one-shot capture (317,867 B, 1.7 s grab) uploaded, and
   the node's upload agent reported it done. A 2-frame continuous run into the ring
   (scratch dir `/tmp/hanwha-check`) gave native 1920×1080 JPEGs with EXIF GPS =
